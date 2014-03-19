@@ -26,7 +26,7 @@ Game.prototype.init = function (ctx) {
 Game.prototype.initPlayer = function () {
   var triangle = new PolygonDef([new Vector(0, 0), new Vector(10, 10), new Vector(10, 0)], "red");
   var fd = new FixtureDef(triangle, 1, 0, 1);
-  var ox = 10;
+  var ox = 0;
   var oy = 0;
   var player = new Body([fd.createFixture(new Vector(ox+5, oy-5)),
                          fd.createFixture(new Vector(ox+5, oy+5), Math.PI/2),
@@ -34,8 +34,8 @@ Game.prototype.initPlayer = function () {
                          fd.createFixture(new Vector(ox-5, oy-5), 3*Math.PI/2)]);
   player.init(new Vector(50, 36), 0, new Vector (0, 0), 0, 0, 0);
   
-  this.world.addBody(player);
   this.player = player;
+  this.world.addPlayer(player);
 };
 
 Game.prototype.initObjects = function () {

@@ -193,6 +193,7 @@ Body.prototype.scale = function (s) {
   this.transform(s, 0, 0, s);
   this.mass *= s*s;
   this.inertia *= s*s;
+  this.radius *= s;
 };
 
 Body.prototype.align = function () {

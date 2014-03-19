@@ -16,6 +16,7 @@ function Camera () {
 
     this.pos = this.rectangle.vertices[0];
 
+    this.vector = new Vector(0, 0);
     this.move = new Vector(0, 0);
 
     //this.computeAABB();
@@ -77,13 +78,22 @@ Camera.prototype.moveTo = function (point) {
 };
 
 Camera.prototype.centerOn = function (body, dt) {
-  body.center.subtract(this.rectangle.centroid, this.move);
+  body.position.subtract(this.rectangle.centroid, this.move);
   this.move.scale(Math.min(1,10*dt));
   this.translateRect(this.move);
 };
 
 Camera.prototype.canSee = function (body) {
   return this.rectangle.aabb.intersects(body.aabb);
+};
+
+Camera.prototype.canReallySee = function (body) {
+  if (game.colHandler.collides(this.rectangle, body)) {
+    this.rectangle.setColliding(false);
+    return true;
+  }
+  else
+    return false;
 };
 
 Camera.prototype.drawWorld = function () {
@@ -99,4 +109,34 @@ Camera.prototype.drawWorld = function () {
   this.rectangle.color = defaults.color;
   this.rectangle.draw(this.ctx);
   this.world.draw(this.ctx);
+  
+  if (!this.canReallySee(this.world.player))
+    this.drawArrow(this.world.player);
+  else if (this.world.player.radius < 5/this.scale)
+    this.drawCircle(this.world.player);
+    
+  
+};
+
+Camera.prototype.drawArrow = function (shape) {
+  var c = shape.position || shape.center || shape.centroid;
+  c.subtract(this.rectangle.centroid, this.vector);
+  var l = this.vector.length();
+  this.vector.scale(50/this.scale / l);
+  this.ctx.beginPath();
+  this.ctx.moveTo(this.rectangle.centroid.x, this.rectangle.centroid.y);
+  this.ctx.lineTo(this.rectangle.centroid.x + this.vector.x, 
+                  this.rectangle.centroid.y + this.vector.y);
+  this.ctx.closePath();
+  this.ctx.lineWidth = 2/this.scale;
+  this.ctx.stroke();
+};
+
+Camera.prototype.drawCircle = function (shape) {
+  var c = shape.position || shape.center || shape.centroid;
+  this.ctx.beginPath();
+  this.ctx.arc(c.x, c.y, 10/this.scale, 0, 2*Math.PI);
+  this.ctx.lineWidth = 1/this.scale;
+  this.ctx.closePath();
+  this.ctx.stroke();
 };

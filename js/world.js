@@ -1,6 +1,7 @@
 function World () {
   this.gravity = new Vector(0, 0);
-  
+
+  this.player = null;
   this.bodies = [];
 
   this.init = function(gravity) {
@@ -14,6 +15,11 @@ function World () {
 World.prototype.applyForces = function (body) {
   this.gravity.multiply(body.mass, this.mg);
   body.force.inc(this.mg);
+};
+
+World.prototype.addPlayer = function (player) {
+  this.player = player;
+  this.addBody(player);
 };
 
 World.prototype.addBody = function (body) {
