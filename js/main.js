@@ -1,14 +1,8 @@
-var scale = 8;
 var game = new Game();
 
 function init() {
-  var canvas = document.getElementById("canvas");
+  var canvas = document.getElementById(defaults.canvas);
   var ctx = canvas.getContext("2d");
-  var width = canvas.width;
-  var height = canvas.height;
-
-  ctx.translate(0, height);
-  ctx.scale(scale, -scale);
 
   game.init(ctx);
   render();

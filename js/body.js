@@ -11,6 +11,8 @@ function Body (fixtures, type) {
   this.force = new Vector(0, 0);
   this.torque = 0;
 
+  this.aabb = new AABB();
+
   // vectors for calculation
   this.r = new Vector(0, 0);
   this.mod = new Vector(0, 0);
@@ -38,7 +40,7 @@ function Body (fixtures, type) {
   this.invInertia = 1 / this.inertia;
 
   // temporary
-  this.aabb = new AABB ();
+
   this.computeAABB();
 };
 
@@ -127,7 +129,7 @@ Body.prototype.applyAngularImpulse = function (impulse) {
 Body.prototype.computeAABB = function () {
   this.aabb.init();
   _.forEach(this.fixtures, function (fx) {
-    this.aabb.expand(fx.shape.bounds);
+    this.aabb.expand(fx.shape.aabb);
   }, this);
 };
 
@@ -197,7 +199,7 @@ Body.prototype.alignCentroid = function () {
  */
 Body.prototype.drawAABB = function (ctx) {
   _.forEach(this.fixtures, function (fx) {
-    fx.shape.drawBounds(ctx);
+    fx.shape.drawAABB(ctx);
     fx.shape.drawDisc(ctx);
   });
   this.aabb.draw(ctx);

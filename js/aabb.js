@@ -1,6 +1,6 @@
-function AABB () {
-  this.min = new Vector (0, 0);
-  this.max = new Vector (0, 0);
+function AABB (min, max) {
+  this.min = min || new Vector (0, 0);
+  this.max = max || new Vector (0, 0);
 
   this.getX = function () {
     return this.min.x;
@@ -20,13 +20,13 @@ function AABB () {
 
   this.init = function () {
     this.min.init(Number.MAX_VALUE, Number.MAX_VALUE);
-    this.max.init(Number.MIN_VALUE, Number.MIN_VALUE);
+    this.max.init(-Number.MAX_VALUE, -Number.MAX_VALUE);
   };
 };
 
-AABB.prototype.expand = function (bounds) {
-  this.min.setMin(bounds.min);
-  this.max.setMax(bounds.max);
+AABB.prototype.expand = function (aabb) {
+  this.min.setMin(aabb.min);
+  this.max.setMax(aabb.max);
 };
 
 AABB.prototype.translate = function (vector) {
@@ -37,7 +37,7 @@ AABB.prototype.translate = function (vector) {
 AABB.prototype.draw = function (ctx) {
   var oldFS = ctx.fillStyle;
   ctx.fillStyle = "rgba(50, 50, 50, 0.4)";
-  ctx.fillRect(this.min.x, this.min.y, 
+  ctx.fillRect(this.min.x, this.min.y,
                this.max.x - this.min.x, 
                this.max.y - this.min.y);
   ctx.fillStyle = oldFS;

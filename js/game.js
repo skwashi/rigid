@@ -1,21 +1,20 @@
 function Game () {
   this.ctx = null;
-  this.ctxWidth = 0;
-  this.ctxHeight = 0;
-  this.time = 0;
-
+  this.camera = new Camera();
   this.world = new World();
   this.player = null;
 
+  this.time = 0;
+  
   // objects for use in calculations
   this.temp = {dir: new Vector(0, 0)};
 };
 
 Game.prototype.init = function (ctx) {
   this.ctx = ctx;
-  this.ctxWidth = ctx.canvas.width;
-  this.ctxHeight = ctx.canvas.height;
-  this.world.init(0);
+  this.world.init(defaults.gravity);
+  this.camera.init(ctx, this.world,
+                   defaults.campos, defaults.scale);
   this.time = Date.now();
   
   this.initPlayer();
@@ -58,13 +57,39 @@ Game.prototype.frameReset = function () {
 };
 
 Game.prototype.handleAdminInput = function (dt) {
-  if (keys["q"])
+  if (keys["z"])
     this.player.align();
-  if (keys["w"])
+  if (keys["x"])
     this.player.alignCentroid();
 };
 
+Game.prototype.handleCameraInput = function (dt) {
+  this.temp.dir.init(0, 0);
+
+  if (keys["w"])
+    this.temp.dir.y += 1;
+  if (keys["s"])
+    this.temp.dir.y -= 1;
+  if (keys["a"])
+    this.temp.dir.x -= 1;
+  if (keys["d"])
+    this.temp.dir.x += 1;
+
+  if (keys["shift"]) {
+    if (!this.temp.dir.x == 0)
+      this.camera.rotate(-this.temp.dir.x*Math.PI/2*dt);
+    if (!this.temp.dir.y == 0)
+      this.camera.incScale(this.temp.dir.y*dt/2);
+  } else {
+    if (!this.temp.dir.isZero())
+      this.camera.translate(this.temp.dir);
+  }
+
+};
+
 Game.prototype.handlePlayerInput = function (dt) {
+  this.temp.dir.init(0, 0);
+
   if (keys["up"])
     this.temp.dir.y += 1;
   if (keys["down"])
@@ -73,23 +98,14 @@ Game.prototype.handlePlayerInput = function (dt) {
     this.temp.dir.x -= 1;
   if (keys["right"])
     this.temp.dir.x += 1;
-
-  var rotation = 0;
-
-  if (keys["a"])
-    rotation += Math.PI/2*dt;
-  if (keys["d"])
-    rotation -= Math.PI/2*dt;
   
   if (keys["shift"]) {
-    this.player.translateLocal(this.temp.dir);
-    this.player.rotatePos(rotation);
-  }
-  else {
+    this.player.rotate(-this.temp.dir.x*Math.PI/2 * dt);
+  } else {
+    this.temp.dir.rotate(this.camera.angle);
     this.player.translate(this.temp.dir);
-    this.player.rotate(rotation);
   }
-
+  
 };
 
 Game.prototype.update = function () {
@@ -98,13 +114,11 @@ Game.prototype.update = function () {
   this.time = now;
   this.frameReset();
   this.handleAdminInput(dt);
+  this.handleCameraInput(dt);
   this.handlePlayerInput(dt);
   this.world.update(dt);
 };
 
 Game.prototype.draw = function () {
-  this.ctx.clearRect(0, 0, this.ctxWidth, this.ctxHeight);
-  this.ctx.fillStyle = "rgba(0, 100, 255, 0.2)";
-  this.ctx.fillRect(0, 0, this.ctxWidth, this.ctxHeight);
-  this.world.draw(this.ctx);
+  this.camera.drawWorld();
 };

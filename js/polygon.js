@@ -85,8 +85,11 @@ function RectangleDef(x, y, w, h, color) {
                  new Vector(x+w,y+h), new Vector(x, y+h)];
   PolygonDef.call(this, vectors, color);
 };
-RectangleDef.prototype = Object.create(Polygon.prototype);
+RectangleDef.prototype = Object.create(PolygonDef.prototype);
 
+RectangleDef.prototype.createShape = function (position, angle) {
+  return new Rectangle(this, position, angle);
+};
 
 function Polygon(polygonDef, position, angle) {
   Shape.call(this);
@@ -113,10 +116,9 @@ function Polygon(polygonDef, position, angle) {
     this.moveTo(position);
   if (angle != undefined)
     this.rotate(angle);
-  this.computeBounds();  
+  this.computeAABB();  
   this.computeEdges();
   this.computeNormals();
-
 };
 Polygon.prototype = Object.create(Shape.prototype);
 
@@ -126,13 +128,12 @@ Polygon.prototype.computeCentroid = function () {
   this.centroid.div(this.vertices.length);
 };
 
-Polygon.prototype.computeBounds = function () {
-  this.bounds.min.init(Number.MAX_VALUE, Number.MAX_VALUE);
-  this.bounds.max.init(Number.MIN_VALUE, Number.MIN_VALUE);
+Polygon.prototype.computeAABB = function () {
+  this.aabb.init();
   
   _.forEach(this.vertices, function (v) {
-    this.bounds.min.setMin(v);
-    this.bounds.max.setMax(v);
+    this.aabb.min.setMin(v);
+    this.aabb.max.setMax(v);
   }, this);
 };
 
@@ -160,7 +161,11 @@ Polygon.prototype.computeNormals = function () {
 Polygon.prototype.translate = function (vector) {
   this.centroid.inc(vector);
   _.forEach(this.vertices, function (vtx) {vtx.inc(vector);});
-  Shape.prototype.translate.call(this, vector);
+  this.aabb.translate(vector);
+};
+
+Polygon.prototype.scale = function (s) {
+  this.transform(s, 0, 0, s);
 };
 
 Polygon.prototype.transform = function (a, b, c, d, o) {
@@ -170,7 +175,7 @@ Polygon.prototype.transform = function (a, b, c, d, o) {
     p = o;
   }
   _.forEach(this.vertices, function (vtx) {vtx.transform(a, b, c, d, p);});
-  this.computeBounds();
+  this.computeAABB();
   this.updated = false;
 };
 
@@ -189,7 +194,7 @@ Polygon.prototype.rotate = function (angle, pivot) {
     vtx.x = c*dx - s*dy + p.x;
     vtx.y = s*dx + c*dy + p.y;
   });
-  this.computeBounds();
+  this.computeAABB();
   this.updated = false;
 };
 
@@ -238,7 +243,9 @@ Polygon.prototype.project = function (axis, out) {
 
 function Rectangle(rectangleDef, position, angle) {
   Polygon.call(this, rectangleDef, position, angle);
+
 };
+Rectangle.prototype = Object.create(Polygon.prototype);
 
 Rectangle.prototype.computeNormals = function () {
   if (this.normals.length == 0) {
@@ -249,3 +256,8 @@ Rectangle.prototype.computeNormals = function () {
   this.edges[0].normal(this.normals[0]);  
   this.edges[1].normal(this.normals[1]);  
 };
+
+Rectangle.prototype.getX = function () {return this.vertices[0].x;};
+Rectangle.prototype.getY = function () {return this.vertices[0].y;};
+Rectangle.prototype.getWidth = function () {return this.vertices[1].x - this.vertices[0].x;};
+Rectangle.prototype.getHeight = function () {return this.vertices[3].y - this.vertices[0].y;};

@@ -32,26 +32,31 @@ function Circle(circleDef, position) {
   this.inertia = circleDef.inertia;
 
   // initialize stuff
-  this.computeBounds();
+  this.computeAABB();
 }
 Circle.prototype = Object.create(Shape.prototype);
 
-Circle.prototype.computeBounds = function () {
-  this.bounds.min.init(this.centroid.x - this.radius,
-                          this.centroid.y - this.radius),
-  this.bounds.max.init(this.centroid.x + this.radius,
-                       this.centroid.y + this.radius);
+Circle.prototype.computeAABB = function () {
+  this.aabb.min.init(this.centroid.x - this.radius,
+                     this.centroid.y - this.radius),
+  this.aabb.max.init(this.centroid.x + this.radius,
+                     this.centroid.y + this.radius);
 };
 
 Circle.prototype.translate = function (vector) {
   this.centroid.inc(vector);
-  Shape.prototype.translate.call(this, vector);
+  this.aabb.translate(vector);
+};
+
+Circle.prototype.scale = function (s) {
+  this.radius *= s;
+  this.computeAABB();
 };
 
 Circle.prototype.rotate = function (angle, pivot) {
   if (pivot != undefined) {
     this.centroid.rotate(angle, pivot);
-    this.computeBounds();
+    this.computeAABB();
   }
 };
 
@@ -62,7 +67,7 @@ Circle.prototype.contains = function (vector) {
 Circle.prototype.draw = function (ctx) {
   ctx.beginPath();
   ctx.arc(this.centroid.x, this.centroid.y, this.radius, 0, 2*Math.PI);
-  ctx.fillStyle = this.color;//this.colliding ? "black" : this.color;
+  ctx.fillStyle = this.color;
   ctx.fill();
 };
 
