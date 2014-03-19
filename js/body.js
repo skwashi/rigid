@@ -189,6 +189,12 @@ Body.prototype.transform = function (a, b, c, d, o) {
   this.computeAABB();
 };
 
+Body.prototype.scale = function (s) {
+  this.transform(s, 0, 0, s);
+  this.mass *= s*s;
+  this.inertia *= s*s;
+};
+
 Body.prototype.align = function () {
   this.position.set(this.centroid);
 };

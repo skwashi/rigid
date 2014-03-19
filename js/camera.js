@@ -16,6 +16,8 @@ function Camera () {
 
     this.pos = this.rectangle.vertices[0];
 
+    this.move = new Vector(0, 0);
+
     //this.computeAABB();
     this.reset();
     defaults.createGradient("ambient", this.ctx, 0, -1000, 0, 1000);
@@ -48,6 +50,11 @@ Camera.prototype.translate = function (vector) {
   this.ctx.translate(-vector.x, -vector.y);
 };
 
+Camera.prototype.translateRect = function (vector) {
+  this.rectangle.translate(vector);
+  this.ctx.translate(-vector.x, -vector.y);
+};
+
 Camera.prototype.incScale = function (s) {
   this.scale *= 1+s;
   this.rectangle.scale(1/(1+s));
@@ -62,6 +69,17 @@ Camera.prototype.rotate = function (angle) {
   this.ctx.translate(this.rectangle.centroid.x, this.rectangle.centroid.y);
   this.ctx.rotate(-angle);
   this.ctx.translate(-this.rectangle.centroid.x, -this.rectangle.centroid.y);
+};
+
+Camera.prototype.moveTo = function (point) {
+  point.subtract(this.rectangle.centroid, this.move);
+  this.translate(this.move);
+};
+
+Camera.prototype.centerOn = function (body, dt) {
+  body.center.subtract(this.rectangle.centroid, this.move);
+  this.move.scale(Math.min(1,10*dt));
+  this.translateRect(this.move);
 };
 
 Camera.prototype.canSee = function (body) {

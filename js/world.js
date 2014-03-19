@@ -29,12 +29,12 @@ World.prototype.update = function (dt) {
   for (var i = 0; i < this.bodies.length; i++) {
     p = this.bodies[i];
     if (p instanceof Body) {
-      p.clearForces();
       this.applyForces(p);
       game.dynamics.applyForces(p);
       game.dynamics.integrate(p, dt);
-    }
-    p.rotate(Math.PI/4*dt); 
+      p.clearForces();
+    } else
+      p.rotate(Math.PI/4*dt); 
     for (var j = i+1; j < this.bodies.length; j++) {
       q = this.bodies[j];
       mtv = game.colHandler.collides(p, q);

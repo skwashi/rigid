@@ -77,6 +77,9 @@ Game.prototype.handleCameraInput = function (dt) {
   if (keys["d"])
     this.temp.dir.x += 1;
 
+  if (keys["q"])
+    this.camera.centerOn(this.player, dt);
+
   if (keys["shift"]) {
     if (!this.temp.dir.x == 0)
       this.camera.rotate(-this.temp.dir.x*Math.PI/2*dt);
@@ -102,10 +105,16 @@ Game.prototype.handlePlayerInput = function (dt) {
     this.temp.dir.x += 1;
   
   if (keys["shift"]) {
-    this.player.rotate(-this.temp.dir.x*Math.PI/2 * dt);
+    if (this.temp.dir.x != 0)
+      this.player.applyTorque(-this.temp.dir.x*500);
+    if (this.temp.dir.y != 0)
+      this.player.scale(1-(this.temp.dir.y*dt/2));
   } else {
-    this.temp.dir.rotate(this.camera.angle);
-    this.player.translate(this.temp.dir);
+    if (!this.temp.dir.isZero()) {
+      this.temp.dir.rotate(this.camera.angle);
+      this.temp.dir.scale(100);
+      this.player.applyCentralForce(this.temp.dir);
+    }
   }
   
 };
