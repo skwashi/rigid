@@ -203,7 +203,7 @@ Polygon.prototype.draw = function (ctx) {
   ctx.moveTo(this.vertices[0].x, this.vertices[0].y);
   _.forEach(this.vertices, function (vtx) {ctx.lineTo(vtx.x, vtx.y);});
   ctx.closePath();
-  ctx.fillStyle = this.colliding ? "black" : this.color;
+  ctx.fillStyle = this.color;//this.colliding ? "black" : this.color;
   ctx.fill();
   //this.computeNormals();
   //this.drawNormals(ctx);

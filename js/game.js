@@ -17,14 +17,28 @@ Game.prototype.init = function (ctx) {
   this.world.init(defaults.gravity);
   this.camera.init(ctx, this.world,
                    defaults.campos, defaults.scale);
+  this.camera.moveTo(new Vector(100/2, 75/2));
   this.time = Date.now();
   
+  this.initStatics();
   this.initPlayer();
   this.initObjects();
 };
 
+Game.prototype.initStatics = function () {
+  var cx = 100/2;
+  var cy = 75/2;
+  var w = 250;
+  var h = 20;
+  var wallDef = new RectangleDef(0, 0, w, h);
+  this.world.addBody(wallDef.createShape(new Vector(cx, cy - (w-h)/2))); 
+  this.world.addBody(wallDef.createShape(new Vector(cx + (w-h)/2, cy), Math.PI/2)); 
+  this.world.addBody(wallDef.createShape(new Vector(cx, cy + (w-h)/2))); 
+  this.world.addBody(wallDef.createShape(new Vector(cx - (w-h)/2, cy), 3*Math.PI/2)); 
+};
+
 Game.prototype.initPlayer = function () {
-  var triangle = new PolygonDef([new Vector(0, 0), new Vector(10, 10), new Vector(10, 0)], "red");
+  var triangle = new PolygonDef([new Vector(0, 0), new Vector(5, 5), new Vector(5, 0)], "red");
   var fd = new FixtureDef(triangle, 1, 0, 1);
   var ox = 0;
   var oy = 0;
@@ -32,21 +46,25 @@ Game.prototype.initPlayer = function () {
                          fd.createFixture(new Vector(ox+5, oy+5), Math.PI/2),
                          fd.createFixture(new Vector(ox-5, oy+5), Math.PI),
                          fd.createFixture(new Vector(ox-5, oy-5), 3*Math.PI/2)]);
-  player.init(new Vector(50, 36), 0, new Vector (0, 0), 0, 0, 0);
+  player.init(new Vector(50, 36), 0, new Vector (0, 0), Math.PI/2, 1, 0);
   
   this.player = player;
   this.world.addPlayer(player);
 };
 
 Game.prototype.initObjects = function () {
-  var poly;
   var sides = 0;
+  var rdef;
+  var fdef;
+  var poly;
   for (var i = 0; i < 4; i++) {
     for (var j = 0; j < 4; j++) {
       if (i % 2 == 0 && j % 2 == 1 ||
           i % 2 == 1 && j % 2 == 0) {
-        var rdef = new RegularPolygonDef(3+sides, 5, "red");
-        poly = new Polygon(rdef, new Vector(10+20*j, 7.5+15*i));
+        rdef = new RegularPolygonDef(3+sides, 5, "red");
+        fdef = new FixtureDef(rdef, 1, 0, 1); 
+        poly = new Body([fdef.createFixture()]);
+        poly.init(new Vector(10+20*j, 7.5+15*i), 0, new Vector(0, 0), Math.PI/4, 1, 0);
         this.world.addBody(poly);
         sides++;
       }
@@ -106,13 +124,13 @@ Game.prototype.handlePlayerInput = function (dt) {
   
   if (keys["shift"]) {
     if (this.temp.dir.x != 0)
-      this.player.applyTorque(-this.temp.dir.x*500);
+      this.player.applyTorque(-this.temp.dir.x*20000);
     if (this.temp.dir.y != 0)
       this.player.scale(1-(this.temp.dir.y*dt/2));
   } else {
     if (!this.temp.dir.isZero()) {
       this.temp.dir.rotate(this.camera.angle);
-      this.temp.dir.scale(100);
+      this.temp.dir.scale(10000);
       this.player.applyCentralForce(this.temp.dir);
     }
   }

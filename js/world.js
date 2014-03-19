@@ -34,18 +34,19 @@ World.prototype.update = function (dt) {
   });
   for (var i = 0; i < this.bodies.length; i++) {
     p = this.bodies[i];
-    if (p instanceof Body) {
+    if (p.type == "dynamic") {
       this.applyForces(p);
       game.dynamics.applyForces(p);
       game.dynamics.integrate(p, dt);
       p.clearForces();
-    } else
-      p.rotate(Math.PI/4*dt); 
-    for (var j = i+1; j < this.bodies.length; j++) {
-      q = this.bodies[j];
-      mtv = game.colHandler.collides(p, q);
-      if (mtv) {
-        game.colHandler.resolve(p, q, mtv);
+      for (var j = 0; j < this.bodies.length; j++) {
+        if (i != j) {
+          q = this.bodies[j];
+          mtv = game.colHandler.collides(p, q);
+          if (mtv) {
+            game.colHandler.resolve(p, q, mtv);
+          }
+        }
       }
     }
   }
@@ -54,7 +55,7 @@ World.prototype.update = function (dt) {
 World.prototype.draw = function (ctx) {
   _.forEach(this.bodies, function (b) {
     b.drawAABB(ctx);
-    b.drawDisc(ctx);
+    //b.drawDisc(ctx);
     b.draw(ctx);
   });
 };

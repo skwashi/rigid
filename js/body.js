@@ -1,5 +1,6 @@
 function Body (fixtures, type) {
   this.fixtures = fixtures;
+  this.type = type || "dynamic";
   this.area = 0;
   this.inertia = 0;
   this.mass = 0;
@@ -18,14 +19,16 @@ function Body (fixtures, type) {
   this.mod = new Vector(0, 0);
   
   this.init = function (position, angle, v, ω, linDamp, angDamp) {
-    this.angle = angle;
-    this.v = v;
-    this.ω = ω;
+    this.angle = angle || 0;
+    this.v = v || new Vector(0, 0);
+    this.ω = ω || 0;
     this.linDamp = linDamp || 0;
     this.angDamp = angDamp || 0;
 
-    this.moveTo(position);
-    this.rotate(angle, position);
+    if (position != undefined) {
+      this.moveTo(position);
+      this.rotate(angle, position);
+    }
   };
   
   // compute properties

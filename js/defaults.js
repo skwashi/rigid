@@ -3,7 +3,7 @@ function Settings () {
   this.color = "rgba(0, 100, 255, 0.2)";
   this.canvas = "canvas";
   this.gravity = new Vector(0, 0);
-  this.scale = 8;
+  this.scale = 4;
   this.gradients = {};
 };
 

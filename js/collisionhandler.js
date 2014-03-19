@@ -205,12 +205,12 @@ CollisionHandler.prototype.collides = function (o1, o2) {
 CollisionHandler.prototype.resolve = function(o1, o2, mtv) {
   var c = 1;
   var f = 0;
-  if (o1 instanceof Body) {
-    if (o2 instanceof Body)
+  if (o1.type == "dynamic") {
+    if (o2.type == "dynamic")
       this.resolveMM(o1, o2, mtv, c, f);
     else
       this.resolveMS(o1, o2, mtv, c, f);
-  } else if (o2 instanceof Body) {
+  } else if (o2.type == "dynamic") {
     mtv.scale(-1);
     this.resolveMS(o2, o1, mtv, c, f);
   } else {
@@ -226,7 +226,7 @@ CollisionHandler.prototype.resolveMS = function(o, s, mtv, c, f) {
   this.dir.projectOut(o.v, this.u1d);
   o.v.subtract(this.u1d, this.u1o);
   this.u1d.scale(-c);
-  this.u1o.scale(f);
+  this.u1o.scale(1-f);
   this.u1o.add(this.u1d, o.v);
 };
 
@@ -262,8 +262,8 @@ CollisionHandler.prototype.resolveMM = function(o1, o2, mtv, c, f) {
   this.dir.multiply(v1dl, this.v1d);
   this.dir.multiply(v2dl, this.v2d);
   
-  this.u1o.scale(f);
-  this.u2o.scale(f);
+  this.u1o.scale(1-f);
+  this.u2o.scale(1-f);
   this.u1o.add(this.v1d, o1.v);
   this.u2o.add(this.v2d, o2.v);
 

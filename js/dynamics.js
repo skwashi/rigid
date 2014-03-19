@@ -1,6 +1,7 @@
 function Dynamics () {
   this.dv = new Vector(0, 0);
   this.dω = 0;
+  this.dp = new Vector(0, 0);
 
   // temporary objects for calculation
   this.f = new Vector(0, 0);
@@ -19,6 +20,7 @@ Dynamics.prototype.integrate = function (body, dt) {
   this.dω = body.torque * dt * body.invInertia;
   body.v.inc(this.dv);
   body.ω += this.dω;
-  body.translate(body.v);
-  body.rotate(body.ω);
+  body.v.multiply(dt, this.dp);
+  body.translate(this.dp);
+  body.rotate(body.ω*dt);
 };
