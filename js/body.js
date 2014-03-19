@@ -21,8 +21,8 @@ function Body (fixtures, type) {
     this.angle = angle;
     this.v = v;
     this.ω = ω;
-    this.linDamp = linDamp;
-    this.angDamp = angDamp;
+    this.linDamp = linDamp || 0;
+    this.angDamp = angDamp || 0;
 
     this.moveTo(position);
     this.rotate(angle, position);
@@ -96,6 +96,11 @@ Body.prototype.computeInertia = function () {
     fx.shape.centroid.subtract(this.centroid, r);
     return sum + fx.inertia + fx.mass * r.lengthSquared();
   }, 0, this);
+};
+
+Body.prototype.clearForces = function () {
+  this.force.init(0, 0);
+  this.torque = 0;
 };
 
 Body.prototype.applyForce = function (force, point) {
@@ -218,4 +223,10 @@ Body.prototype.draw = function (ctx) {
   });
   this.position.draw(ctx, "blue");
   this.centroid.draw(ctx, "rgba(50,100,100,0.8)");
+};
+
+Body.prototype.setColliding = function (col) {
+  _.forEach(this.fixtures, function (fxt) {
+    fxt.shape.setColliding(col);
+  });
 };

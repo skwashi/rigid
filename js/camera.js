@@ -18,6 +18,7 @@ function Camera () {
 
     //this.computeAABB();
     this.reset();
+    defaults.createGradient("ambient", this.ctx, 0, -1000, 0, 1000);
   };
 
 };
@@ -70,7 +71,14 @@ Camera.prototype.canSee = function (body) {
 Camera.prototype.drawWorld = function () {
   this.rectangle.color = "white";
   this.rectangle.draw(this.ctx);
-  this.rectangle.color = "rgba(0, 100, 255, 0.2)";
+/*
+  var amb = this.ctx.createLinearGradient(0, -1000, 0, 2000);
+  amb.addColorStop(1, "rgba(0,4,50,0.4");
+  amb.addColorStop(0.5, "rgba(0,2,25,0.4)");
+  amb.addColorStop(0.2, "rgba(0,1,13,0.4)");
+  amb.addColorStop(0, "black");
+*/
+  this.rectangle.color = defaults.color;
   this.rectangle.draw(this.ctx);
   this.world.draw(this.ctx);
 };

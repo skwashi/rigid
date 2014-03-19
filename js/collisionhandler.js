@@ -39,8 +39,6 @@ CollisionHandler.prototype.collidesAxes = function (shape1, axes1,
       return false;
     else {
       o = this.getOverlap();
-      //console.log(this.p1.min);
-      //console.log(this.p2);
       if (o < overlap) {
         overlap = o;
         smallest = axes1[i];
@@ -72,17 +70,18 @@ CollisionHandler.prototype.collidesAxes = function (shape1, axes1,
   
   shape1.setColliding(true);
   shape2.setColliding(true);
+
   return this.mtv;
 };
 
-CollisionHandler.prototype.collidesCC = function (c1, c2) {
+CollisionHandler.prototype.collidesCircleCircle = function (c1, c2) {
   c1.centroid.subtract(c2.centroid, this.axis);
   this.axis.normalize();
   return this.collidesAxes(c1, [this.axis],
                            c2, []);
 };
 
-CollisionHandler.prototype.collidesPC = function (poly, circle, flip) {
+CollisionHandler.prototype.collidesPolygonCircle = function (poly, circle, flip) {
   if (!poly.updated) {
     poly.computeNormals();
   }
@@ -110,7 +109,7 @@ CollisionHandler.prototype.collidesPC = function (poly, circle, flip) {
   
 };
 
-CollisionHandler.prototype.collidesPP = function (poly1, poly2) {
+CollisionHandler.prototype.collidesPolygonPolygon = function (poly1, poly2) {
   if (!poly1.updated) {
     poly1.computeNormals();
   }
@@ -125,77 +124,93 @@ CollisionHandler.prototype.collidesPP = function (poly1, poly2) {
 };
 
 
-CollisionHandler.prototype.collides = function (shape1, shape2) {
-  if (!shape1.collides(shape2))
+CollisionHandler.prototype.collidesShapeShape = function (shape1, shape2) {
+  if (!shape1.aabb.intersects(shape2.aabb))
     return false;
 
   var col = false;
-  if (shape1 instanceof Union) {
-    for (var i = 0, len = shape1.shapes.length; i < len; i++) {
-      col = this.collides(shape1.shapes[i], shape2);
-      if (col != false)
-        return col;
-    }
-    return false;
-  } else if (shape2 instanceof Union) {
-    for (var j = 0, l = shape2.shapes.length; j < l; j++) {
-      col = this.collides(shape1, shape2.shapes[j]);
-      if (col != false)
-        return col;
-    }
-    return false;
-  }
 
   if (shape1.isPolygon) {
     if (shape2.isPolygon)
-      return this.collidesPP(shape1, shape2);
+      return this.collidesPolygonPolygon(shape1, shape2);
     else if (shape2.isCircle)
-      return this.collidesPC(shape1, shape2);
+      return this.collidesPolygonCircle(shape1, shape2);
     else
       return false;
   } else if (shape1.isCircle) {
     if (shape2.isCircle)
-      return this.collidesCC(shape1, shape2);
+      return this.collidesCircleCircle(shape1, shape2);
     else if (shape2.isPolygon)
-      return this.collidesPC(shape2, shape1, true);
+      return this.collidesPolygonCircle(shape2, shape1, true);
     else
       return false;
   } else
     return false;
 };
 
-CollisionHandler.prototype.col = function(o1, o2) {
+CollisionHandler.prototype.collidesBodyShape = function (b, s, flip) {
+  if (!b.aabb.intersects(s.aabb))
+    return false;
 
-  return this.collides(o1.shape || o1, o2.shape || o2);
-  /*
-  if (o1 instanceof Movable) {
-    if (o2 instanceof Movable) {
-      o1.v.subtract(o2.v, this.relv);
-      return this.collides(o1.shape, o2.shape);
-    }
-    else {
-      this.relv.set(o1.v);
-      return this.collides(o1.shape, o2);
-    }
-  } else if (o2 instanceof Movable) {
-    this.relv.set(o2.v);
-    this.relv.scale(-1);
-    return this.collides(o1, o2.shape);
-  } else {
-    o2.centroid.subtract(o1.centroid, this.relv);
-    return this.collides(o1, o2);
-  }*/
+  var mtv;
+  var mtvs = [];
+  for (var i = 0; i < b.fixtures.length; i++) {
+    if (flip)
+      mtv = this.collidesShapeShape(s, b.fixtures[i].shape);
+    else
+      mtv = this.collidesShapeShape(b.fixtures[i].shape, s);
+    if (mtv)
+      mtvs.push([mtv, i, 0]);
+  }
+  
+  if (mtvs.length != 0)
+    return mtvs[0][0];
+  else
+    return false;
 };
 
-CollisionHandler.prototype.resolve = function(o1, o2, mtv, cr, fr) {
-  var c = (cr == undefined) ? 1 :  cr;
-  var f = f || 1;
-  if (o1 instanceof Movable) {
-    if (o2 instanceof Movable)
+CollisionHandler.prototype.collidesBodyBody = function (b1, b2) {
+  if (!b1.aabb.intersects(b2.aabb))
+    return false;
+
+  var mtv;
+  var mtvs = [];
+  for (var i = 0; i < b1.fixtures.length; i++) {
+    for (var j = 0; j < b2.fixtures.length; j++) {
+      mtv = this.collidesShapeShape(b1.fixtures[i].shape, b2.fixtures[j].shape);
+      if (mtv)
+        mtvs.push([mtv, i, j]);
+    }
+  }
+  if (mtvs.length != 0)
+    return mtvs[0][0];
+  else
+    return false;
+};
+
+CollisionHandler.prototype.collides = function (o1, o2) {
+  if (o1 instanceof Body) {
+    if (o2 instanceof Body)
+      return this.collidesBodyBody(o1, o2);
+    else
+      return this.collidesBodyShape(o1, o2);
+  } else {
+    if (o2 instanceof Body)
+      return this.collidesBodyShape(o2, o1, true);
+    else
+      return this.collidesShapeShape(o1, o2);    
+  }
+};
+
+CollisionHandler.prototype.resolve = function(o1, o2, mtv) {
+  var c = 1;
+  var f = 0;
+  if (o1 instanceof Body) {
+    if (o2 instanceof Body)
       this.resolveMM(o1, o2, mtv, c, f);
     else
       this.resolveMS(o1, o2, mtv, c, f);
-  } else if (o2 instanceof Movable) {
+  } else if (o2 instanceof Body) {
     mtv.scale(-1);
     this.resolveMS(o2, o1, mtv, c, f);
   } else {
@@ -255,9 +270,9 @@ CollisionHandler.prototype.resolveMM = function(o1, o2, mtv, c, f) {
   var t = Math.abs(pen / (v1dl - v2dl));
   if (t <= 1/60) {
     this.v1d.multiply(t, this.move);
-    o1.shape.translate(this.move);
+    o1.translate(this.move);
     this.v2d.multiply(t, this.move);
-    o2.shape.translate(this.move);
+    o2.translate(this.move);
   }
 
 };

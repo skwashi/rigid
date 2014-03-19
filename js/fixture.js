@@ -19,6 +19,7 @@ function FixtureDef(shapeDef, density, friction, restitution) {
   this.friction = friction || 0;
   this.restitution = restitution || 1;
   this.mass = density * shapeDef.area;
+  this.inertia = this.mass * shapeDef.inertia;
 };
 
 FixtureDef.prototype.createFixture = function (position, angle) {
@@ -31,6 +32,7 @@ function Fixture (fixtureDef, position, angle) {
   this.friction = fixtureDef.friction;
   this.restitution = fixtureDef.restitution;
   this.mass = fixtureDef.mass;
+  this.inertia = fixtureDef.inertia;
 };
 
 Fixture.prototype.setBody = function (body) {

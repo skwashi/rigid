@@ -1,5 +1,7 @@
 function Game () {
   this.ctx = null;
+  this.colHandler = new CollisionHandler();
+  this.dynamics = new Dynamics();
   this.camera = new Camera();
   this.world = new World();
   this.player = null;
@@ -30,7 +32,7 @@ Game.prototype.initPlayer = function () {
                          fd.createFixture(new Vector(ox+5, oy+5), Math.PI/2),
                          fd.createFixture(new Vector(ox-5, oy+5), Math.PI),
                          fd.createFixture(new Vector(ox-5, oy-5), 3*Math.PI/2)]);
-  player.init(new Vector(50, 36), 0, new Vector (0, 0), 0, 0);
+  player.init(new Vector(50, 36), 0, new Vector (0, 0), 0, 0, 0);
   
   this.world.addBody(player);
   this.player = player;
