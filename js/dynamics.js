@@ -15,8 +15,8 @@ Dynamics.prototype.applyForces = function (body) {
 };
 
 Dynamics.prototype.integrate = function (body, dt) {
-  body.force.multiply(dt / body.mass, this.dv);
-  this.dω = body.torque * dt / body.inertia;
+  body.force.multiply(dt * body.invMass, this.dv);
+  this.dω = body.torque * dt * body.invInertia;
   body.v.inc(this.dv);
   body.ω += this.dω;
   body.translate(body.v);

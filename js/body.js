@@ -192,7 +192,9 @@ Body.prototype.transform = function (a, b, c, d, o) {
 Body.prototype.scale = function (s) {
   this.transform(s, 0, 0, s);
   this.mass *= s*s;
+  this.invMass = 1/this.mass;
   this.inertia *= s*s;
+  this.invInertia = 1/this.inertia;
   this.radius *= s;
 };
 
