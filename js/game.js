@@ -1,5 +1,6 @@
 function Game () {
   this.ctx = null;
+  this.input = new Input();
   this.colHandler = new CollisionHandler();
   this.dynamics = new Dynamics();
   this.camera = new Camera();
@@ -7,9 +8,15 @@ function Game () {
   this.player = null;
 
   this.time = 0;
+  this.isPaused = false;
   
   // objects for use in calculations
-  this.temp = {dir: new Vector(0, 0)};
+  this.vars = {dir: new Vector(0, 0), 
+               playerMove: new Vector(0, 0), 
+               cameraMove: new Vector(0, 0)};
+
+  this.cd = 0.5;
+  this.cooldowns = {toggle: 0};
 };
 
 Game.prototype.init = function (ctx) {
@@ -20,6 +27,7 @@ Game.prototype.init = function (ctx) {
   this.initPlayer();
   this.initStatics();
   this.initObjects();
+  this.initTestObjects();
   this.camera.init(ctx, this.world,
                    defaults.campos, defaults.scale);
   this.camera.moveTo(new Vector(100/2, 75/2));
@@ -72,69 +80,87 @@ Game.prototype.initObjects = function () {
   }
 };
 
-Game.prototype.frameReset = function () {
-  this.temp.dir.init(0, 0);
+Game.prototype.initTestObjects = function () {
+  var rdef = new RectangleDef(0, 0, 0.5, 2, "green");
+  var fdef = new FixtureDef(rdef, 100, 0 , 1);
+  var body = new Body([fdef.createFixture(new Vector(0, 0))]);
+  body.init(new Vector(60, 70), 0, new Vector(0, 0), 0, 0 ,0);
+  this.world.addBody(body);
 };
 
 Game.prototype.handleAdminInput = function (dt) {
-  if (keys["z"])
-    this.player.align();
-  if (keys["x"])
-    this.player.alignCentroid();
+  for (var key in this.input.toggles) {
+    if (keys[key] && this.cooldowns.toggle <= 0) {
+      this.input.toggles[key](this);
+      this.cooldowns.toggle = this.cd;
+    }
+  }
 };
 
 Game.prototype.handleCameraInput = function (dt) {
-  this.temp.dir.init(0, 0);
+  this.vars.dir.init(0, 0);
 
   if (keys["w"])
-    this.temp.dir.y += 1;
+    this.vars.dir.y += 1;
   if (keys["s"])
-    this.temp.dir.y -= 1;
+    this.vars.dir.y -= 1;
   if (keys["a"])
-    this.temp.dir.x -= 1;
+    this.vars.dir.x -= 1;
   if (keys["d"])
-    this.temp.dir.x += 1;
+    this.vars.dir.x += 1;
 
   if (keys["q"])
     this.camera.centerOn(this.player, dt);
 
   if (keys["shift"]) {
-    if (!this.temp.dir.x == 0)
-      this.camera.rotate(-this.temp.dir.x*Math.PI/2*dt);
-    if (!this.temp.dir.y == 0)
-      this.camera.incScale(this.temp.dir.y*dt/2);
+    if (!this.vars.dir.x == 0)
+      this.camera.rotate(-this.vars.dir.x*Math.PI/2*dt);
+    if (!this.vars.dir.y == 0)
+      this.camera.incScale(this.vars.dir.y*dt/2);
   } else {
-    if (!this.temp.dir.isZero())
-      this.camera.translate(this.temp.dir);
+    if (!this.vars.dir.isZero())
+      this.camera.translate(this.vars.dir);
   }
 
 };
 
 Game.prototype.handlePlayerInput = function (dt) {
-  this.temp.dir.init(0, 0);
+  this.vars.dir.init(0, 0);
 
   if (keys["up"])
-    this.temp.dir.y += 1;
+    this.vars.dir.y += 1;
   if (keys["down"])
-    this.temp.dir.y -= 1;
+    this.vars.dir.y -= 1;
   if (keys["left"])
-    this.temp.dir.x -= 1;
+    this.vars.dir.x -= 1;
   if (keys["right"])
-    this.temp.dir.x += 1;
+    this.vars.dir.x += 1;
   
   if (keys["shift"]) {
-    if (this.temp.dir.x != 0)
-      this.player.applyTorque(-this.temp.dir.x*20000);
-    if (this.temp.dir.y != 0)
-      this.player.scale(1-(this.temp.dir.y*dt/2));
+    if (this.vars.dir.x != 0)
+      this.player.applyTorque(-this.vars.dir.x*20000);
+    if (this.vars.dir.y != 0)
+      this.player.scale(1-(this.vars.dir.y*dt/2));
   } else {
-    if (!this.temp.dir.isZero()) {
-      this.temp.dir.rotate(this.camera.angle);
-      this.temp.dir.scale(10000);
-      this.player.applyCentralForce(this.temp.dir);
+    if (!this.vars.dir.isZero()) {
+      this.vars.dir.rotate(this.camera.angle);
+      this.vars.dir.scale(10000);
+      this.player.applyCentralForce(this.vars.dir);
     }
   }
   
+};
+
+Game.prototype.frameReset = function () {
+  this.vars.dir.init(0, 0);
+};
+
+Game.prototype.lowerCooldowns = function (dt) {
+  for (var key in this.cooldowns) {
+    this.cooldowns[key] -= dt;
+    if (this.cooldowns[key] <= 0)
+      this.cooldowns[key] = 0;
+  }
 };
 
 Game.prototype.update = function () {
@@ -142,10 +168,13 @@ Game.prototype.update = function () {
   var dt = (now - this.time)/1000;
   this.time = now;
   this.frameReset();
+  this.lowerCooldowns(dt);
   this.handleAdminInput(dt);
   this.handleCameraInput(dt);
-  this.handlePlayerInput(dt);
-  this.world.update(dt);
+  if (!this.isPaused) {
+    this.handlePlayerInput(dt);
+    this.world.update(dt);
+  }
 };
 
 Game.prototype.draw = function () {

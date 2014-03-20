@@ -233,8 +233,8 @@ Body.prototype.draw = function (ctx) {
   _.forEach(this.fixtures, function (fx) {
     fx.shape.draw(ctx);
   });
-  this.position.draw(ctx, "blue");
-  this.centroid.draw(ctx, "rgba(50,100,100,0.8)");
+  //this.position.draw(ctx, "blue");
+  //this.centroid.draw(ctx, "rgba(50,100,100,0.8)");
 };
 
 Body.prototype.setColliding = function (col) {

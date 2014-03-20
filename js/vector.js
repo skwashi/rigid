@@ -1,56 +1,55 @@
 function Vector(x, y) {
   this.x = x;
   this.y = y;
-
-  this.init = function (x, y) {
-    this.x = x;
-    this.y = y;
-    return this;
-  };
-
-  this.set = function (v) {
-    this.x = v.x;
-    this.y = v.y;
-    return this;
-  };
-  
-  this.inc = function (v) {
-    this.x += v.x;
-    this.y += v.y;
-    return this;
-  };
-
-  this.dec = function (v) {
-    this.x -= v.x;
-    this.y -= v.y;
-    return this;
-  };
-
-  this.scale = function (a) {
-    this.x *= a;
-    this.y *= a;
-    return this;
-  };
-
-  this.div = function (a) {
-    this.x /= a;
-    this.y /= a;
-  };
-
-  this.normalize = function () {
-    var l = this.length();
-    if (l != 0) {
-      this.x /= l;
-      this.y /= l;
-    }
-    return this;
-  };
-
-  this.isZero = function () {
-    return (this.x == 0 && this.y == 0);
-  };
-
 }
+
+Vector.prototype.init = function (x, y) {
+  this.x = x;
+  this.y = y;
+  return this;
+};
+
+Vector.prototype.set = function (v) {
+  this.x = v.x;
+  this.y = v.y;
+  return this;
+};
+
+Vector.prototype.inc = function (v) {
+  this.x += v.x;
+  this.y += v.y;
+  return this;
+};
+
+Vector.prototype.dec = function (v) {
+  this.x -= v.x;
+  this.y -= v.y;
+  return this;
+};
+
+Vector.prototype.scale = function (a) {
+  this.x *= a;
+  this.y *= a;
+  return this;
+};
+
+Vector.prototype.div = function (a) {
+  this.x /= a;
+  this.y /= a;
+};
+
+Vector.prototype.normalize = function () {
+  var l = this.length();
+  if (l != 0) {
+    this.x /= l;
+    this.y /= l;
+  }
+  return this;
+};
+
+Vector.prototype.isZero = function () {
+  return (this.x == 0 && this.y == 0);
+};
 
 Vector.prototype.clone = function () {
   return new Vector(this.x, this.y);

@@ -36,7 +36,7 @@ World.prototype.update = function (dt) {
     p = this.bodies[i];
     if (p.type == "dynamic") {
       this.applyForces(p);
-      game.dynamics.applyForces(p);
+      game.dynamics.applyDamping(p);
       game.dynamics.integrate(p, dt);
       p.clearForces();
       for (var j = 0; j < this.bodies.length; j++) {
