@@ -18,6 +18,7 @@ function Camera () {
 
     this.vector = new Vector(0, 0);
     this.move = new Vector(0, 0);
+    this.ray = new Ray(0, 0);
 
     //this.computeAABB();
     this.reset();
@@ -121,22 +122,36 @@ Camera.prototype.drawWorld = function () {
 Camera.prototype.drawArrow = function (shape) {
   var c = shape.position || shape.center || shape.centroid;
   c.subtract(this.rectangle.centroid, this.vector);
-  var l = this.vector.length();
-  this.vector.scale(50/this.scale / l);
-  this.ctx.beginPath();
-  this.ctx.moveTo(this.rectangle.centroid.x, this.rectangle.centroid.y);
-  this.ctx.lineTo(this.rectangle.centroid.x + this.vector.x, 
-                  this.rectangle.centroid.y + this.vector.y);
-  this.ctx.closePath();
-  this.ctx.lineWidth = 2/this.scale;
-  this.ctx.stroke();
+  this.ray.set(this.rectangle.centroid, this.vector);
+  var points = this.rectangle.intersectedRay(this.ray);
+  if (points) {
+    var len1 = this.vector.length();
+    var p = points[0];
+    c.subtract(p, this.vector);
+    var len2 = this.vector.length();
+    this.vector.scale((len1-len2-Math.log(len2))/len2);
+    var x = this.rectangle.centroid.x + this.vector.x;
+    var y = this.rectangle.centroid.y + this.vector.y;
+    this.ctx.beginPath();
+    this.ctx.moveTo(x, y);
+    this.ctx.lineTo(p.x, p.y);
+    /*
+     this.ctx.lineTo(x + this.vector.x/10, 
+     y + this.vector.y/10);
+     */
+    this.ctx.closePath();
+    this.ctx.lineWidth = 6/this.scale;
+    this.ctx.strokeStyle = defaults.lineColor;
+    this.ctx.stroke();
+  }
 };
 
 Camera.prototype.drawCircle = function (shape) {
   var c = shape.position || shape.center || shape.centroid;
   this.ctx.beginPath();
-  this.ctx.arc(c.x, c.y, 10/this.scale, 0, 2*Math.PI);
-  this.ctx.lineWidth = 1/this.scale;
+  this.ctx.arc(c.x, c.y, 15/this.scale, 0, 2*Math.PI);
+  this.ctx.lineWidth = 2/this.scale;
   this.ctx.closePath();
+  this.ctx.strokeStyle = "red";
   this.ctx.stroke();
 };

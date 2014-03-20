@@ -43,6 +43,32 @@ Circle.prototype.computeAABB = function () {
                      this.centroid.y + this.radius);
 };
 
+
+/***
+ * c + r (cos a, sin a) = p + kv + lu
+ * r (cos a, sin a) = v.(p - c) + k v.v
+ * (cos a, sin a) = v.(p-c) + k |v|^2
+ * r^2 = v.(p-c)^2 + k^2 |v|^4 + 2k v.(p-c) |v|^2
+ */
+Circle.prototype.intersectedRay = function (ray) {
+  var k = ray.project(this.centroid);
+  ray.e.multiply(k, ray.vec);
+  ray.p1.add(ray.vec, ray.vec);
+  var p = ray.vec;
+  var d2 = this.centroid.distanceSquared(p);
+  var r2 = this.radius*this.radius;
+  if (d2 > r2)
+    return false;
+  else {
+    var dk = Math.sqrt(this.radius*this.radius - d2);
+    this.points[0].init(ray.p1.x + (k-dk)*ray.e.x,
+                        ray.p1.y + (k-dk)*ray.e.y);
+    this.points[1].init(ray.p1.x + (k+dk)*ray.e.x,
+                        ray.p1.x + (k+dk)*ray.e.y);
+    return this.points;
+  }
+};
+
 Circle.prototype.translate = function (vector) {
   this.centroid.inc(vector);
   this.aabb.translate(vector);

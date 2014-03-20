@@ -158,6 +158,24 @@ Polygon.prototype.computeNormals = function () {
   this.updated = true;
 };
 
+Polygon.prototype.intersectedRay = function (ray) {
+  var idx = 0;
+  var res;
+  for (var i = 0; i < this.edges.length; i++) {
+    res = this.edges[i].intersectedRay(ray, this.points[idx]);
+    if(res)
+      idx++;
+    if (idx > 1)
+      break;
+  };
+  if (idx == 0)
+    return false;
+  else if (idx == 1)
+    return [this.points[0]];
+  else
+    return this.points;
+};
+
 Polygon.prototype.translate = function (vector) {
   this.centroid.inc(vector);
   _.forEach(this.vertices, function (vtx) {vtx.inc(vector);});

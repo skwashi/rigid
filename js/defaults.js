@@ -1,6 +1,7 @@
 function Settings () {
   this.campos = new Vector(0, 0);
   this.color = "rgba(0, 100, 255, 0.2)";
+  this.lineColor = "rgba(10, 150, 20, 0.6)";
   this.canvas = "canvas";
   this.gravity = new Vector(0, 0);
   this.scale = 4;

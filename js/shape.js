@@ -3,6 +3,11 @@ function Shape() {
   this.isPolygon = false;
 
   this.aabb = new AABB();
+
+  // a convex shape can be crossed by a ray in up to two points
+  this.points = [];
+  this.points[0] = new Vector(0, 0);
+  this.points[1] = new Vector(0, 0);
 }
 
 Shape.prototype.setColliding = function (col) {
