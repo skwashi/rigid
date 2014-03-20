@@ -1,5 +1,6 @@
 function Game () {
   this.ctx = null;
+  this.hud = null;
   this.input = new Input();
   this.colHandler = new CollisionHandler();
   this.dynamics = new Dynamics();
@@ -9,10 +10,12 @@ function Game () {
   this.player = null;
 
   this.time = 0;
+  this.fps = 0;
 
   // toggle booleans
   this.isPaused = false;
   this.showGrid = false;
+  this.showFps = false;
   
   // objects for use in calculations
   this.vars = {dir: new Vector(0, 0), 
@@ -23,8 +26,9 @@ function Game () {
   this.cooldowns = {toggle: 0};
 };
 
-Game.prototype.init = function (ctx) {
+Game.prototype.init = function (ctx, hud) {
   this.ctx = ctx;
+  this.hud = hud;
   this.time = Date.now();
   
   this.world.init(defaults.gravity);
@@ -187,6 +191,12 @@ Game.prototype.lowerCooldowns = function (dt) {
 Game.prototype.update = function () {
   var now = Date.now();
   var dt = (now - this.time)/1000;
+  this.fps = 1/dt;
+
+  if (this.hud.showFps &&
+      now % 10 == 0)
+    this.hud.changed = true;
+
   this.time = now;
   this.frameReset();
   this.lowerCooldowns(dt);
@@ -202,4 +212,5 @@ Game.prototype.draw = function () {
   this.camera.drawWorld();
   if (this.showGrid)
     this.grid.draw(this.ctx, this.player.aabb);
+  this.hud.draw();
 };

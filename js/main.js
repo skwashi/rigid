@@ -3,8 +3,11 @@ var game = new Game();
 function init() {
   var canvas = document.getElementById(defaults.canvas);
   var ctx = canvas.getContext("2d");
-  
-  game.init(ctx);
+  var hudCanvas = document.getElementById(defaults.hudCanvas);
+  var hudCtx = hudCanvas.getContext("2d");
+  var hud = new Hud(hudCtx);
+
+  game.init(ctx, hud);
   render();
 }
 

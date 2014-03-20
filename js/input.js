@@ -12,8 +12,8 @@ function Input () {
     "x": function (game) {
       game.player.alignCentroid();
     },
-    "c": function (game) {
-      console.log(game.grid.collidingObjects("dynamics"));
+    "f": function (game) {
+      game.hud.toggle("showFps");
     }
   };
 };

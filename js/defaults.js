@@ -5,6 +5,8 @@ function Settings () {
   this.color = "rgba(0, 100, 255, 0.2)";
   this.lineColor = "rgba(10, 150, 20, 0.6)";
   this.canvas = "canvas";
+  this.hudCanvas = "hud";
+  this.hudColor = "green";
   this.gravity = new Vector(0, 0);
   this.scale = 4;
   this.gradients = {};
