@@ -16,6 +16,9 @@ function Camera () {
 
     this.pos = this.rectangle.vertices[0];
 
+    this.followed = game.player;
+    this.marked = game.player;
+
     this.vector = new Vector(0, 0);
     this.move = new Vector(0, 0);
     this.ray = new Ray(0, 0);
@@ -110,13 +113,12 @@ Camera.prototype.drawWorld = function () {
   this.rectangle.color = defaults.color;
   this.rectangle.draw(this.ctx);
   this.world.draw(this.ctx);
+
   
-  if (!this.canReallySee(this.world.player))
-    this.drawArrow(this.world.player);
-  else if (this.world.player.radius < 5/this.scale)
-    this.drawCircle(this.world.player);
-    
-  
+  if (!this.canReallySee(this.marked))
+    this.drawArrow(this.marked);
+  if (this.followed.radius < 5/this.scale)
+    this.drawCircle(this.followed);
 };
 
 Camera.prototype.drawArrow = function (shape) {
@@ -129,7 +131,9 @@ Camera.prototype.drawArrow = function (shape) {
     var p = points[0];
     c.subtract(p, this.vector);
     var len2 = this.vector.length();
-    this.vector.scale((len1-len2-Math.log(len2))/len2);
+    this.vector.scale((len1-len2-2*Math.sqrt(len2/this.scale))/len2);
+    //var f = Math.min(1,2/(1+Math.log(1+len2/32)/Math.LN2));
+    //f = 0;
     var x = this.rectangle.centroid.x + this.vector.x;
     var y = this.rectangle.centroid.y + this.vector.y;
     this.ctx.beginPath();

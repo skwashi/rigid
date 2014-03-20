@@ -14,15 +14,15 @@ function Game () {
 
 Game.prototype.init = function (ctx) {
   this.ctx = ctx;
+  this.time = Date.now();
+  
   this.world.init(defaults.gravity);
+  this.initPlayer();
+  this.initStatics();
+  this.initObjects();
   this.camera.init(ctx, this.world,
                    defaults.campos, defaults.scale);
   this.camera.moveTo(new Vector(100/2, 75/2));
-  this.time = Date.now();
-  
-  this.initStatics();
-  this.initPlayer();
-  this.initObjects();
 };
 
 Game.prototype.initStatics = function () {
@@ -30,7 +30,7 @@ Game.prototype.initStatics = function () {
   var cy = 75/2;
   var w = 250;
   var h = 20;
-  var wallDef = new RectangleDef(0, 0, w, h);
+  var wallDef = new RectangleDef(0, 0, w, h, defaults.color);
   this.world.addBody(wallDef.createShape(new Vector(cx, cy - (w-h)/2))); 
   this.world.addBody(wallDef.createShape(new Vector(cx + (w-h)/2, cy), Math.PI/2)); 
   this.world.addBody(wallDef.createShape(new Vector(cx, cy + (w-h)/2))); 
