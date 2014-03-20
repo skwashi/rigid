@@ -18,19 +18,6 @@ function Body (fixtures, type) {
   this.r = new Vector(0, 0);
   this.mod = new Vector(0, 0);
   
-  this.init = function (position, angle, v, ω, linDamp, angDamp) {
-    this.angle = angle || 0;
-    this.v = v || new Vector(0, 0);
-    this.ω = ω || 0;
-    this.linDamp = linDamp || 0;
-    this.angDamp = angDamp || 0;
-
-    if (position != undefined) {
-      this.moveTo(position);
-      this.rotate(angle, position);
-    }
-  };
-  
   // compute properties
   this.computeCenter();
   this.computeRadius();
@@ -46,6 +33,22 @@ function Body (fixtures, type) {
 
   this.computeAABB();
 };
+
+Body.prototype.init = function (position, angle, v, ω, linDamp, angDamp) {
+  this.angle = angle || 0;
+  this.v = v || new Vector(0, 0);
+  this.ω = ω || 0;
+  this.linDamp = linDamp || 0;
+  this.angDamp = angDamp || 0;
+  
+  if (position != undefined) {
+    this.moveTo(position);
+  }
+  if (angle != 0) {
+    this.rotatePos(angle);
+  }
+};
+
 
 Body.prototype.computeCenter = function () {
   this.center.init(0, 0);
@@ -199,6 +202,7 @@ Body.prototype.scale = function (s) {
   this.inertia *= s*s;
   this.invInertia = 1/this.inertia;
   this.radius *= s;
+  this.area *= s*s;
 };
 
 Body.prototype.align = function () {

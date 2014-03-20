@@ -1,27 +1,27 @@
 function AABB (min, max) {
   this.min = min || new Vector (0, 0);
   this.max = max || new Vector (0, 0);
+};
 
-  this.getX = function () {
-    return this.min.x;
-  };
+AABB.prototype.getX = function () {
+  return this.min.x;
+};
 
-  this.getY = function () {
-    return this.min.y;
-  };
+AABB.prototype.getY = function () {
+  return this.min.y;
+};
 
-  this.getWidth = function () {
-    return this.max.x - this.min.x;
-  };
-  
-  this.getHeight = function () {
-    return this.max.y - this.min.y;
-  };
+AABB.prototype.getWidth = function () {
+  return this.max.x - this.min.x;
+};
 
-  this.init = function () {
-    this.min.init(Number.MAX_VALUE, Number.MAX_VALUE);
-    this.max.init(-Number.MAX_VALUE, -Number.MAX_VALUE);
-  };
+AABB.prototype.getHeight = function () {
+  return this.max.y - this.min.y;
+};
+
+AABB.prototype.init = function () {
+  this.min.init(Number.MAX_VALUE, Number.MAX_VALUE);
+  this.max.init(-Number.MAX_VALUE, -Number.MAX_VALUE);
 };
 
 AABB.prototype.expand = function (aabb) {

@@ -27,7 +27,6 @@ function Camera () {
     this.reset();
     defaults.createGradient("ambient", this.ctx, 0, -1000, 0, 1000);
   };
-
 };
 
 Camera.prototype.reset = function () {
@@ -92,7 +91,7 @@ Camera.prototype.canSee = function (body) {
 };
 
 Camera.prototype.canReallySee = function (body) {
-  if (game.colHandler.collides(this.rectangle, body)) {
+  if (game.colHandler.collides(body, this.rectangle)) {
     this.rectangle.setColliding(false);
     return true;
   }

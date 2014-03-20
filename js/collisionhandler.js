@@ -31,6 +31,8 @@ CollisionHandler.prototype.collidesAxes = function (shape1, axes1,
   var smallest = null;
   var overlap = Number.MAX_VALUE;
   var o;
+
+  shape2.centroid.subtract(shape1.centroid, this.dir);
   
   for (var i = 0; i < axes1.length; i++) {
     shape1.project(axes1[i], this.p1);
@@ -61,12 +63,11 @@ CollisionHandler.prototype.collidesAxes = function (shape1, axes1,
   }
 
   this.mtv.set(smallest);
-  shape2.centroid.subtract(shape1.centroid, this.dir);  
 
   if (this.dir.dot(this.mtv) > 0)
     this.mtv.scale(-overlap);
   else
-    this.mtv.scale(overlap);
+  this.mtv.scale(overlap);
   
   shape1.setColliding(true);
   shape2.setColliding(true);
@@ -152,6 +153,8 @@ CollisionHandler.prototype.collidesBodyShape = function (b, s, flip) {
   if (!b.aabb.intersects(s.aabb))
     return false;
 
+  this.relv.set(b.v);
+
   var mtv;
   var mtvs = [];
   for (var i = 0; i < b.fixtures.length; i++) {
@@ -170,6 +173,8 @@ CollisionHandler.prototype.collidesBodyShape = function (b, s, flip) {
 };
 
 CollisionHandler.prototype.collidesBodyBody = function (b1, b2) {
+  b2.v.subtract(b1.v, this.relv);
+
   if (!b1.aabb.intersects(b2.aabb))
     return false;
 
@@ -189,13 +194,15 @@ CollisionHandler.prototype.collidesBodyBody = function (b1, b2) {
 };
 
 CollisionHandler.prototype.collides = function (o1, o2) {
-  if (o1 instanceof Body) {
-    if (o2 instanceof Body)
+  this.relv.init(0, 0);
+
+  if (o1.type == "dynamic") {
+    if (o2.type == "dynamic")
       return this.collidesBodyBody(o1, o2);
     else
       return this.collidesBodyShape(o1, o2);
   } else {
-    if (o2 instanceof Body)
+    if (o2.type == "dynamic")
       return this.collidesBodyShape(o2, o1, true);
     else
       return this.collidesShapeShape(o1, o2);    

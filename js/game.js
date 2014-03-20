@@ -5,10 +5,14 @@ function Game () {
   this.dynamics = new Dynamics();
   this.camera = new Camera();
   this.world = new World();
+  this.grid = new Grid(defaults.tileWidth, defaults.tileHeight);
   this.player = null;
 
   this.time = 0;
+
+  // toggle booleans
   this.isPaused = false;
+  this.showGrid = false;
   
   // objects for use in calculations
   this.vars = {dir: new Vector(0, 0), 
@@ -28,6 +32,7 @@ Game.prototype.init = function (ctx) {
   this.initStatics();
   this.initObjects();
   this.initTestObjects();
+  this.initSmalls();
   this.camera.init(ctx, this.world,
                    defaults.campos, defaults.scale);
   this.camera.moveTo(new Vector(100/2, 75/2));
@@ -76,6 +81,22 @@ Game.prototype.initObjects = function () {
         this.world.addBody(poly);
         sides++;
       }
+    }
+  }
+};
+
+Game.prototype.initSmalls = function () {
+  var rdef = new RegularPolygonDef(3, 0.1, "blue");
+  var fdef = new FixtureDef(rdef, 1, 0, 1);
+  var pos;
+  var poly;
+  for (var k = 0; k < 50; k++) {
+    for (var l = 0; l < 20; l++) {
+      pos = new Vector(50 - 30 + 2*k, 75+2*l);
+      poly = new Body([fdef.createFixture()]);
+      poly.init(pos, 0, new Vector(0, 0), 0, 0, 0);
+      //poly = rdef.createShape(pos);
+      this.world.addBody(poly);
     }
   }
 };
@@ -179,4 +200,6 @@ Game.prototype.update = function () {
 
 Game.prototype.draw = function () {
   this.camera.drawWorld();
+  if (this.showGrid)
+    this.grid.draw(this.ctx, this.player.aabb);
 };

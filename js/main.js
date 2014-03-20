@@ -3,7 +3,7 @@ var game = new Game();
 function init() {
   var canvas = document.getElementById(defaults.canvas);
   var ctx = canvas.getContext("2d");
-
+  
   game.init(ctx);
   render();
 }

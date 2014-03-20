@@ -1,4 +1,6 @@
 function Settings () {
+  this.tileWidth = 10;
+  this.tileHeight = 10;
   this.campos = new Vector(0, 0);
   this.color = "rgba(0, 100, 255, 0.2)";
   this.lineColor = "rgba(10, 150, 20, 0.6)";
