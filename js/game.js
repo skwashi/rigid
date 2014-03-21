@@ -59,12 +59,13 @@ Game.prototype.initPlayer = function () {
   var fd = new FixtureDef(triangle, 1, 0, 1);
   var ox = 0;
   var oy = 0;
-  var player = new Body([fd.createFixture(new Vector(ox+5, oy-5)),
-                         fd.createFixture(new Vector(ox+5, oy+5), Math.PI/2),
-                         fd.createFixture(new Vector(ox-5, oy+5), Math.PI),
-                         fd.createFixture(new Vector(ox-5, oy-5), 3*Math.PI/2)]);
-  player.init(new Vector(50, 36), 0, new Vector (0, 0), Math.PI/2, 1, 0);
-  
+  var player = new Body([fd.createFixture(new Vector(ox, oy+10), 3*Math.PI/4),
+    fd.createFixture(new Vector(ox+5, oy-5)),
+    fd.createFixture(new Vector(ox+5, oy+5), Math.PI/2),
+    fd.createFixture(new Vector(ox-5, oy+5), Math.PI),
+    fd.createFixture(new Vector(ox-5, oy-5), 3*Math.PI/2)]);
+  player.init(new Vector(50, 36), 0, new Vector (0, 0), 0, 1, 1000);
+
   this.player = player;
   this.world.addPlayer(player);
 };
@@ -163,14 +164,15 @@ Game.prototype.handlePlayerInput = function (dt) {
   
   if (keys["shift"]) {
     if (this.vars.dir.x != 0)
-      this.player.applyTorque(-this.vars.dir.x*20000);
+      this.player.applyTorque(-this.vars.dir.x*2000);
     if (this.vars.dir.y != 0)
       this.player.scale(1-(this.vars.dir.y*dt/2));
   } else {
     if (!this.vars.dir.isZero()) {
       this.vars.dir.rotate(this.camera.angle);
-      this.vars.dir.scale(10000);
-      this.player.applyCentralForce(this.vars.dir);
+      this.vars.dir.scale(1000);
+      this.player.applyForce(this.vars.dir, 
+                             this.player.fixtures[0].shape.centroid);
     }
   }
   

@@ -36,6 +36,7 @@ Vector.prototype.scale = function (a) {
 Vector.prototype.div = function (a) {
   this.x /= a;
   this.y /= a;
+  return this;
 };
 
 Vector.prototype.normalize = function () {
@@ -81,9 +82,17 @@ Vector.prototype.add = function (v, out) {
   out.y = v.y + this.y;
 };
 
+Vector.prototype.addNew = function (v) {
+  return new Vector (this.x + v.x, this.y + v.y);
+};
+
 Vector.prototype.subtract = function (v, out) {
   out.x = this.x - v.x;
   out.y = this.y - v.y;
+};
+
+Vector.prototype.subNew = function (v) {
+  return new Vector (this.x - v.x, this.y - v.y);
 };
 
 Vector.prototype.length = function () {

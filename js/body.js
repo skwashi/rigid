@@ -112,7 +112,7 @@ Body.prototype.clearForces = function () {
 Body.prototype.applyForce = function (force, point) {
   this.force.inc(force);
   point.subtract(this.centroid, this.r);
-  this.torque += r.cross(force);
+  this.torque += this.r.cross(force);
 };
 
 Body.prototype.applyCentralForce = function (force) {
