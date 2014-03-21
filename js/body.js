@@ -124,7 +124,7 @@ Body.prototype.applyTorque = function (torque) {
 };
 
 Body.prototype.applyLinearImpulse = function (impulse, point) {
-  this.impulse.multiply(this.invMass, this.mod);
+  impulse.multiply(this.invMass, this.mod);
   this.v.inc(this.mod);
 
   point.subtract(this.centroid, this.r);

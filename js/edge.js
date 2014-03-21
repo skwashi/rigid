@@ -79,7 +79,7 @@ Edge.prototype.length = function () {
 
 Edge.prototype.normal = function (out) {
   this.update();
-  this.e.perpNormal(out);
+  this.e.outwardNormal(out);
 };
 
 Edge.prototype.intersectedRay = function (ray, point) {

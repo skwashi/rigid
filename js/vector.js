@@ -165,7 +165,14 @@ Vector.prototype.perp = function(out) {
   out.x = -this.y;
   out.y = this.x;
 };
+
 Vector.prototype.perpNormal = function(out) {
+  out.x = -this.y;
+  out.y = this.x;
+  out.normalize();
+};
+
+Vector.prototype.outwardNormal = function (out) {
   out.x = this.y;
   out.y = -this.x;
   out.normalize();

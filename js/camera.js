@@ -109,6 +109,7 @@ Camera.prototype.drawWorld = function () {
   amb.addColorStop(0.2, "rgba(0,1,13,0.4)");
   amb.addColorStop(0, "black");
 */
+  this.ctx.lineWidth = 1/this.scale;
   this.rectangle.color = defaults.color;
   this.rectangle.draw(this.ctx);
   this.world.draw(this.ctx);

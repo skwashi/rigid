@@ -55,7 +55,7 @@ Game.prototype.initStatics = function () {
 };
 
 Game.prototype.initPlayer = function () {
-  var triangle = new PolygonDef([new Vector(0, 0), new Vector(5, 5), new Vector(5, 0)], "red");
+  var triangle = new PolygonDef([new Vector(0, 0), new Vector(5, 0), new Vector(5, 5)], "red");
   var fd = new FixtureDef(triangle, 1, 0, 1);
   var ox = 0;
   var oy = 0;
@@ -64,7 +64,7 @@ Game.prototype.initPlayer = function () {
     fd.createFixture(new Vector(ox+5, oy+5), Math.PI/2),
     fd.createFixture(new Vector(ox-5, oy+5), Math.PI),
     fd.createFixture(new Vector(ox-5, oy-5), 3*Math.PI/2)]);
-  player.init(new Vector(50, 36), 0, new Vector (0, 0), 0, 1, 1000);
+  player.init(new Vector(50, 36), 0, new Vector (0, 0), 0, 100, 5000);
 
   this.player = player;
   this.world.addPlayer(player);
@@ -110,7 +110,7 @@ Game.prototype.initTestObjects = function () {
   var rdef = new RectangleDef(0, 0, 0.5, 2, "green");
   var fdef = new FixtureDef(rdef, 100, 0 , 1);
   var body = new Body([fdef.createFixture(new Vector(0, 0))]);
-  body.init(new Vector(60, 70), 0, new Vector(0, 0), 0, 0 ,0);
+  body.init(new Vector(60, 70), 0, new Vector(0, 0), 0, 0, 0);
   this.world.addBody(body);
 };
 
@@ -164,15 +164,15 @@ Game.prototype.handlePlayerInput = function (dt) {
   
   if (keys["shift"]) {
     if (this.vars.dir.x != 0)
-      this.player.applyTorque(-this.vars.dir.x*2000);
+      this.player.applyTorque(-this.vars.dir.x*20000);
     if (this.vars.dir.y != 0)
       this.player.scale(1-(this.vars.dir.y*dt/2));
   } else {
     if (!this.vars.dir.isZero()) {
+      this.vars.dir.scale(10000);
       this.vars.dir.rotate(this.camera.angle);
-      this.vars.dir.scale(1000);
       this.player.applyForce(this.vars.dir, 
-                             this.player.fixtures[0].shape.centroid);
+                             this.player.centroid.addNew(this.player.fixtures[0].shape.centroid.subNew(this.player.centroid).scale(0.25)));
     }
   }
   

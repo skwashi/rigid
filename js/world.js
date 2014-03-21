@@ -95,7 +95,7 @@ World.prototype.draw = function (ctx) {
   });
   _.forEach(this.bodies, function (b) {
     if (game.camera.canSee(b)) {
-      b.drawAABB(ctx);
+      //b.drawAABB(ctx);
       //b.drawDisc(ctx);
       b.draw(ctx);
     }

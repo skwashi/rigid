@@ -216,25 +216,31 @@ Polygon.prototype.rotate = function (angle, pivot) {
   this.updated = false;
 };
 
-Polygon.prototype.draw = function (ctx) {
+Polygon.prototype.draw = function (ctx, stroke) {
   ctx.beginPath();
   ctx.moveTo(this.vertices[0].x, this.vertices[0].y);
   _.forEach(this.vertices, function (vtx) {ctx.lineTo(vtx.x, vtx.y);});
   ctx.closePath();
-  ctx.fillStyle = this.color;//this.colliding ? "black" : this.color;
-  ctx.fill();
+  if (stroke) {
+    ctx.strokeStyle = this.color;//this.colliding ? "black" : this.color;
+    ctx.stroke();
+  } else {
+    ctx.fillStyle = this.color;
+    ctx.fill();
+  }
   //this.computeNormals();
   //this.drawNormals(ctx);
 };
 
 Polygon.prototype.drawNormals = function (ctx) {
   ctx.strokeStyle = "black";
+  ctx.lineWidth = 1;
   _.forEach(this.vertices, function (vtx, i) {
     if (this.normals[i] != undefined) {
       ctx.beginPath();
       ctx.moveTo(vtx.x, vtx.y);
-      ctx.lineTo(vtx.x + 50*this.normals[i].x, 
-                 vtx.y + 50*this.normals[i].y);
+      ctx.lineTo(vtx.x + 5*this.normals[i].x, 
+                 vtx.y + 5*this.normals[i].y);
       ctx.closePath();
       ctx.stroke();
     }
