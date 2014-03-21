@@ -210,7 +210,7 @@ CollisionHandler.prototype.collides = function (o1, o2) {
 };
 
 CollisionHandler.prototype.resolve = function(o1, o2, mtv) {
-  var c = 1;
+  var c = defaults.restitution;
   var f = 0;
   if (o1.type == "dynamic") {
     if (o2.type == "dynamic")

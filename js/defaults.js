@@ -10,6 +10,7 @@ function Settings () {
   this.gravity = new Vector(0, 0);
   this.scale = 4;
   this.gradients = {};
+  this.restitution = 0;
 };
 
 Settings.prototype.createGradient = function(name, ctx, from_x, from_y, to_x, to_y) {
