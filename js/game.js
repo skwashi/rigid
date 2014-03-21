@@ -91,7 +91,7 @@ Game.prototype.initObjects = function () {
 };
 
 Game.prototype.initSmalls = function () {
-  var rdef = new RegularPolygonDef(3, 0.1, "blue");
+  var rdef = new RegularPolygonDef(3, 1, "blue");
   var fdef = new FixtureDef(rdef, 1, 0, 1);
   var pos;
   var poly;
