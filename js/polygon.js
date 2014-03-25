@@ -1,6 +1,7 @@
-function PolygonDef(vectors, color) {
+function PolygonDef(vectors, color, alpha) {
   this.vertices = vectors;
   this.color = color;
+  this.alpha = alpha;
   this.centroid = new Vector(0, 0);
   this.radius = 0;
   this.area = 0;
@@ -67,7 +68,7 @@ PolygonDef.prototype.computeInertia = function () {
     this.centroid.length()*this.centroid.length();*/
 };
 
-function RegularPolygonDef(n, radius, color) {
+function RegularPolygonDef(n, radius, color, alpha) {
   var vertices = [];
   var da = Math.PI * 2/n;
   var a = 0;
@@ -75,15 +76,15 @@ function RegularPolygonDef(n, radius, color) {
     vertices.push(new Vector(radius * Math.cos(a), radius * Math.sin(a)));
     a += da;
   };
-  PolygonDef.call(this, vertices, color);
+  PolygonDef.call(this, vertices, color, alpha);
 };
 RegularPolygonDef.prototype = Object.create(PolygonDef.prototype);
 
 
-function RectangleDef(x, y, w, h, color) {
+function RectangleDef(x, y, w, h, color, alpha) {
   var vectors = [new Vector(x,y), new Vector(x+w, y),
                  new Vector(x+w,y+h), new Vector(x, y+h)];
-  PolygonDef.call(this, vectors, color);
+  PolygonDef.call(this, vectors, color, alpha);
 };
 RectangleDef.prototype = Object.create(PolygonDef.prototype);
 
@@ -102,6 +103,7 @@ function Polygon(polygonDef, position, angle) {
   }, this);
 
   this.color = polygonDef.color;
+  this.alpha = polygonDef.alpha;
   this.centroid = polygonDef.centroid.clone();
   this.radius = polygonDef.radius;
   this.area = polygonDef.area;

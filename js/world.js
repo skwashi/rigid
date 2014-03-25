@@ -25,7 +25,12 @@ World.prototype.addPlayer = function (player) {
 
 World.prototype.addBody = function (body) {
   if (body.type == "dynamic") {
-    this.bodies.push(body);
+    this.bodies.push(body);/*
+    var t = new PIXI.Texture.fromImage("ship.png");
+    var b = new PIXI.Sprite(t);
+    b.position = body.centroid;
+    b.anchor.set(0.5, 0.5);
+    graphics.addChild(b);*/
   } else {
     this.statics.push(body);
     game.grid.registerObject(body, "statics");
@@ -48,7 +53,7 @@ World.prototype.update = function (dt) {
 
   var mtv;
   var objects;
-  /*
+/*
   for (var j = 0; j < this.bodies.length; j++) {
     p = this.bodies[j];
     objects = game.grid.collidesWith(p, "dynamics");
@@ -66,7 +71,6 @@ World.prototype.update = function (dt) {
     }, this);
   }
   */
-  
   _.forEach(this.statics, function (s) {
     objects = game.grid.collidesWith(s, "dynamics");
     _.forEach(objects, function (b) {
@@ -85,7 +89,7 @@ World.prototype.update = function (dt) {
     if (mtv)
       game.colHandler.resolve(pair[0], pair[1], mtv);
   }, this);
-  
+
 };
 
 World.prototype.draw = function (ctx) {

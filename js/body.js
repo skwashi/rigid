@@ -162,6 +162,8 @@ Body.prototype.translate = function (vector) {
 };
 
 Body.prototype.rotate = function (angle, pivot) {
+  if (Math.abs(this.ω) < 0.00000001)
+    ;//return;
   var p = this.centroid;
   if (pivot != undefined) {
     this.centroid.rotate(angle, pivot);

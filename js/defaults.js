@@ -1,8 +1,11 @@
 function Settings () {
-  this.tileWidth = 10;
-  this.tileHeight = 10;
+  this.width = 800;
+  this.height = 600;
+  this.tileWidth = 5;
+  this.tileHeight = 5;
   this.campos = new Vector(0, 0);
-  this.color = "rgba(0, 100, 255, 0.2)";
+  this.color = "rgba(0, 100, 255, 0.2)"; //0x0064ff;
+  this.alpha = 0.2;
   this.lineColor = "rgba(10, 150, 20, 0.6)";
   this.canvas = "canvas";
   this.hudCanvas = "hud";
@@ -10,7 +13,8 @@ function Settings () {
   this.gravity = new Vector(0, 0);
   this.scale = 4;
   this.gradients = {};
-  this.restitution = 0;
+  this.restitution = 1;
+  this.renderer = "pixi";
 };
 
 Settings.prototype.createGradient = function(name, ctx, from_x, from_y, to_x, to_y) {

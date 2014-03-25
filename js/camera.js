@@ -23,6 +23,9 @@ function Camera () {
     this.move = new Vector(0, 0);
     this.ray = new Ray(0, 0);
 
+    // pixi stuff
+    //this.scale = graphics.scale;
+
     //this.computeAABB();
     this.reset();
     defaults.createGradient("ambient", this.ctx, 0, -1000, 0, 1000);
@@ -39,6 +42,12 @@ Camera.prototype.reset = function () {
 
 Camera.prototype.resetContext = function () {
   this.ctx.setTransform(this.defaultScale,0,0,-this.defaultScale,0,this.ctxHeight);
+
+  graphics.scale.x = this.defaultScale;
+  graphics.scale.y = -this.defaultScale;
+  graphics.position = new PIXI.Point(400, 300);
+  graphics.pivot = this.rectangle.centroid;
+   
 };
 
 Camera.prototype.computeAABB = function () {
@@ -61,10 +70,13 @@ Camera.prototype.translateRect = function (vector) {
 
 Camera.prototype.incScale = function (s) {
   this.scale *= 1+s;
+  graphics.scale.x *= 1+s;
+  graphics.scale.y *= 1+s;
   this.rectangle.scale(1/(1+s));
   this.ctx.translate(this.rectangle.centroid.x, this.rectangle.centroid.y);
   this.ctx.scale(1+s, 1+s);
   this.ctx.translate(-this.rectangle.centroid.x, -this.rectangle.centroid.y);
+  
 };
 
 Camera.prototype.rotate = function (angle) {
@@ -73,6 +85,7 @@ Camera.prototype.rotate = function (angle) {
   this.ctx.translate(this.rectangle.centroid.x, this.rectangle.centroid.y);
   this.ctx.rotate(-angle);
   this.ctx.translate(-this.rectangle.centroid.x, -this.rectangle.centroid.y);
+  graphics.rotation += angle;
 };
 
 Camera.prototype.moveTo = function (point) {
@@ -158,4 +171,38 @@ Camera.prototype.drawCircle = function (shape) {
   this.ctx.closePath();
   this.ctx.strokeStyle = "red";
   this.ctx.stroke();
+};
+
+Camera.prototype.drawPixi = function (graphics) {
+  graphics.clear();
+  
+  _.forEach(this.world.statics, function (s) {
+    if (this.canSee(s))
+      this.drawBody(graphics, s);
+  }, this); 
+  _.forEach(this.world.bodies, function (b) {
+    if (this.canSee(b))
+        this.drawBody(graphics, b);
+  }, this);
+};
+
+Camera.prototype.drawBody = function (g, body) {
+  if (!body.fixtures)
+    this.drawPolygon(g, body);
+  else
+    _.forEach(body.fixtures, function (fxt) {
+      this.drawPolygon(g, fxt.shape);
+    }, this);
+};
+
+Camera.prototype.drawPolygon = function (g, polygon) {
+  g.beginFill(polygon.color, polygon.alpha);
+  g.moveTo(polygon.vertices[0].x, polygon.vertices[0].y);
+
+  for (var i = 1; i < polygon.vertices.length; i++) {
+   g.lineTo(polygon.vertices[i].x, polygon.vertices[i].y);
+  }
+  g.lineTo(polygon.vertices[0].x,
+                  polygon.vertices[0].y);
+  g.endFill();
 };

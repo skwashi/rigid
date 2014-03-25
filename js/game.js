@@ -47,7 +47,7 @@ Game.prototype.initStatics = function () {
   var cy = 75/2;
   var w = 250;
   var h = 20;
-  var wallDef = new RectangleDef(0, 0, w, h, defaults.color);
+  var wallDef = new RectangleDef(0, 0, w, h, defaults.color, defaults.alpha);
   this.world.addBody(wallDef.createShape(new Vector(cx, cy - (w-h)/2))); 
   this.world.addBody(wallDef.createShape(new Vector(cx + (w-h)/2, cy), Math.PI/2)); 
   this.world.addBody(wallDef.createShape(new Vector(cx, cy + (w-h)/2))); 
@@ -55,7 +55,7 @@ Game.prototype.initStatics = function () {
 };
 
 Game.prototype.initPlayer = function () {
-  var triangle = new PolygonDef([new Vector(0, 0), new Vector(5, 0), new Vector(5, 5)], "red");
+  var triangle = new PolygonDef([new Vector(0, 0), new Vector(7, 0), new Vector(7,7)], "red", 1);
   var fd = new FixtureDef(triangle, 1, 0, 1);
   var ox = 0;
   var oy = 0;
@@ -64,7 +64,7 @@ Game.prototype.initPlayer = function () {
     fd.createFixture(new Vector(ox+5, oy+5), Math.PI/2),
     fd.createFixture(new Vector(ox-5, oy+5), Math.PI),
     fd.createFixture(new Vector(ox-5, oy-5), 3*Math.PI/2)]);
-  player.init(new Vector(50, 36), 0, new Vector (0, 0), 0, 100, 5000);
+  player.init(new Vector(50, 36), 0, new Vector (0, 0), 0, 70, 500);
 
   this.player = player;
   this.world.addPlayer(player);
@@ -79,7 +79,7 @@ Game.prototype.initObjects = function () {
     for (var j = 0; j < 4; j++) {
       if (i % 2 == 0 && j % 2 == 1 ||
           i % 2 == 1 && j % 2 == 0) {
-        rdef = new RegularPolygonDef(3+sides, 5, "red");
+        rdef = new RegularPolygonDef(3+sides, 5, "red", 1);
         fdef = new FixtureDef(rdef, 1, 0, 1); 
         poly = new Body([fdef.createFixture()]);
         poly.init(new Vector(10+20*j, 7.5+15*i), 0, new Vector(0, 0), Math.PI/4, 1, 0);
@@ -91,23 +91,22 @@ Game.prototype.initObjects = function () {
 };
 
 Game.prototype.initSmalls = function () {
-  var rdef = new RegularPolygonDef(3, 1, "blue");
+  var rdef = new RegularPolygonDef(3, 1, "blue", 0.8);
   var fdef = new FixtureDef(rdef, 1, 0, 1);
   var pos;
   var poly;
   for (var k = 0; k < 50; k++) {
-    for (var l = 0; l < 20; l++) {
-      pos = new Vector(50 - 30 + 2*k, 75+2*l);
+    for (var l = 0; l < 30; l++) {
+      pos = new Vector(50 - 50 + 2*k, 75+2*l);
       poly = new Body([fdef.createFixture()]);
       poly.init(pos, 0, new Vector(0, 0), 0, 0, 0);
-      //poly = rdef.createShape(pos);
       this.world.addBody(poly);
     }
   }
 };
 
 Game.prototype.initTestObjects = function () {
-  var rdef = new RectangleDef(0, 0, 0.5, 2, "green");
+  var rdef = new RectangleDef(0, 0, 0.5, 2, "green", 1);
   var fdef = new FixtureDef(rdef, 100, 0 , 1);
   var body = new Body([fdef.createFixture(new Vector(0, 0))]);
   body.init(new Vector(60, 70), 0, new Vector(0, 0), 0, 0, 0);
@@ -119,6 +118,7 @@ Game.prototype.handleAdminInput = function (dt) {
     if (keys[key] && this.cooldowns.toggle <= 0) {
       this.input.toggles[key](this);
       this.cooldowns.toggle = this.cd;
+      this.hud.changed = true;
     }
   }
 };
@@ -210,9 +210,11 @@ Game.prototype.update = function () {
   }
 };
 
-Game.prototype.draw = function () {
+Game.prototype.render = function () {
+  //this.camera.drawPixi(graphics);
   this.camera.drawWorld();
   if (this.showGrid)
     this.grid.draw(this.ctx, this.player.aabb);
   this.hud.draw();
+  //renderer.render(stage);
 };
